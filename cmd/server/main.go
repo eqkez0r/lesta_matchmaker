@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"github.com/eqkez0r/lesta_matchmaker/internal/app"
 	"github.com/eqkez0r/lesta_matchmaker/internal/app/config"
 	zaplogger "github.com/eqkez0r/lesta_matchmaker/internal/logger/zap"
 	"github.com/eqkez0r/lesta_matchmaker/internal/storage"
@@ -22,12 +23,14 @@ func main() {
 		os.Exit(1)
 	}
 
-	storage, err := storage.NewStorage(ctx, l, cfg.DatabaseConfig)
+	store, err := storage.NewStorage(ctx, l, cfg.DatabaseConfig)
 	if err != nil {
 		l.Errorf("Error creating storage: %v", err)
 		os.Exit(1)
 	}
 
-	defer storage.GracefulStop()
+	defer store.GracefulStop()
 
+	a := app.New(ctx, l, store, cfg)
+	a.Run(ctx)
 }

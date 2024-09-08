@@ -20,6 +20,7 @@ func AddPlayerHandler(
 	ctx context.Context,
 	l logger.ILogger,
 	p PutPlayerQueueProvider,
+	pch chan<- player.Player,
 ) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var pl player.Player
@@ -33,6 +34,7 @@ func AddPlayerHandler(
 			c.AbortWithStatus(http.StatusInternalServerError)
 			return
 		}
+		pch <- pl
 		l.Infof("player was added to queue %v", pl)
 	}
 }

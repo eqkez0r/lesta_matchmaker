@@ -5,9 +5,11 @@ import (
 	"github.com/eqkez0r/lesta_matchmaker/internal/logger"
 	"github.com/eqkez0r/lesta_matchmaker/internal/storage"
 	"github.com/eqkez0r/lesta_matchmaker/pkg/object/player"
+	"sync"
 )
 
 type StorageMemory struct {
+	mu        sync.Mutex
 	logger    logger.ILogger
 	PlayerMap map[string]player.Player
 }
@@ -25,7 +27,9 @@ func (s *StorageMemory) PutPlayer(ctx context.Context, player player.Player) err
 	if ok {
 		return storage.ErrPlayerInQueue
 	}
+	s.mu.Lock()
 	s.PlayerMap[player.Name] = player
+	s.mu.Unlock()
 	return nil
 }
 

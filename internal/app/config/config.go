@@ -3,6 +3,7 @@ package config
 import (
 	"errors"
 	"flag"
+	mmcfg "github.com/eqkez0r/lesta_matchmaker/internal/matchmaker/config"
 	servercfg "github.com/eqkez0r/lesta_matchmaker/internal/server/config"
 	dbcfg "github.com/eqkez0r/lesta_matchmaker/internal/storage/config"
 	"github.com/ilyakaznacheev/cleanenv"
@@ -19,8 +20,9 @@ var (
 )
 
 type Config struct {
-	ServerConfig   servercfg.ServerConfig `json:"server_config"`
-	DatabaseConfig dbcfg.DatabaseConfig   `json:"database_config"`
+	ServerConfig     servercfg.ServerConfig `json:"server_config"`
+	DatabaseConfig   dbcfg.DatabaseConfig   `json:"database_config"`
+	MatchmakerConfig mmcfg.MatchmakerConfig `json:"matchmaker_config"`
 }
 
 func NewConfig() (*Config, error) {
@@ -29,6 +31,7 @@ func NewConfig() (*Config, error) {
 	flag.StringVar(&cfg.ServerConfig.Host, "a", defaultAddr, "server host")
 	flag.StringVar(&cfg.DatabaseConfig.DatabaseURL, "d", "", "database uri")
 	flag.StringVar(&cfg.DatabaseConfig.DatabaseType, "t", "pgx", "database type")
+	flag.UintVar(&cfg.MatchmakerConfig.GroupSize, "gs", 10, "group size")
 	flag.Parse()
 
 	if len(flag.Args()) != 0 {

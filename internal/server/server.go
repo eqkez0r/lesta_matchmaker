@@ -7,6 +7,7 @@ import (
 	"github.com/eqkez0r/lesta_matchmaker/internal/server/handlers"
 	"github.com/eqkez0r/lesta_matchmaker/internal/server/middleware"
 	"github.com/eqkez0r/lesta_matchmaker/internal/storage"
+	"github.com/eqkez0r/lesta_matchmaker/pkg/object/player"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"sync"
@@ -24,14 +25,14 @@ func New(
 	l logger.ILogger,
 	config servercfg.ServerConfig,
 	store storage.IStorage,
-
+	pch chan player.Player,
 ) *HTTPServer {
 	gin.DisableConsoleColor()
 	gin.SetMode(gin.ReleaseMode)
 
 	router := gin.New()
 	router.Use(gin.Recovery(), middleware.Logger(l))
-	router.Handle("POST", handlers.PutPlayerPath, handlers.AddPlayerHandler(ctx, l, store))
+	router.Handle("POST", handlers.PutPlayerPath, handlers.AddPlayerHandler(ctx, l, store, pch))
 
 	return &HTTPServer{
 		server: &http.Server{
