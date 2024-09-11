@@ -9,8 +9,14 @@ type ZapLogger struct {
 }
 
 func New() *ZapLogger {
+	cfg := zap.NewDevelopmentConfig()
+	cfg.DisableStacktrace = true
+	logger, err := cfg.Build()
+	if err != nil {
+		panic(err)
+	}
 	return &ZapLogger{
-		logger: zap.NewExample().Sugar(),
+		logger: logger.Sugar(),
 	}
 }
 
