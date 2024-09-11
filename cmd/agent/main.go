@@ -22,6 +22,7 @@ func main() {
 	counter := 0
 	go func() {
 		for {
+			time.Sleep(time.Second)
 			select {
 			case <-ctx.Done():
 				fmt.Println("exit")
@@ -30,7 +31,7 @@ func main() {
 			default:
 				{
 					name := fmt.Sprintf("Player-%d", counter)
-					skill := rand.Float32() * 10
+					skill := rand.Float32() * 5
 					latency := rand.Float32() * 100
 					pl := &player.Player{
 						Name:    name,
@@ -40,18 +41,19 @@ func main() {
 					resp, err := client.R().
 						SetHeader("Content-Type", "application/json").
 						SetBody(pl).
-						Post("http://your-server-endpoint")
+						Post("http://127.0.0.1:8080/users")
 
 					if err != nil {
 						fmt.Println("Error:", err)
-						return
+						continue
 					}
 
 					fmt.Println("Player", pl.Name, "sent. Response:", resp.Status())
 					counter++
+
 				}
 			}
-			time.Sleep(500 * time.Millisecond)
+
 		}
 	}()
 	wg.Wait()

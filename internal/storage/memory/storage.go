@@ -34,10 +34,22 @@ func (s *StorageMemory) PutPlayer(ctx context.Context, player player.Player) err
 }
 
 func (s *StorageMemory) DeleteGroupPlayer(ctx context.Context, players []player.Player) error {
+	s.mu.Lock()
 	for _, pl := range players {
 		delete(s.PlayerMap, pl.Name)
 	}
+	s.mu.Unlock()
 	return nil
+}
+
+func (s *StorageMemory) GetAllPlayers(ctx context.Context) ([]player.Player, error) {
+	s.mu.Lock()
+	var players []player.Player
+	for _, pl := range s.PlayerMap {
+		players = append(players, pl)
+	}
+	s.mu.Unlock()
+	return players, nil
 }
 
 func (s *StorageMemory) GracefulStop() {

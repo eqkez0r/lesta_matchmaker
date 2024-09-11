@@ -1,19 +1,4 @@
 services:
-  builder:
-    build:
-      context: ..
-      target: builder
-
-  server_img:
-    build:
-      context: ..
-      target: server_runner
-
-  agent_img:
-    build:
-      context: ..
-      target: agent_runner
-
   postgresql:
     image: postgres:16-alpine
     container_name: mm-psql
@@ -25,33 +10,5 @@ services:
       - "127.0.0.1:5432:5432"
     volumes:
       - ./data:/var/lib/postgresql/data
-    networks:
-      - ps
 
-  server:
-    image: mathcmaker:server
-    container_name: matchmaker-server
-    ports:
-      - "8080:8080"
-    environment:
-      - SERVER_HOST = "127.0.0.1:8080"
-      - GROUP_SIZE = 10
-      - DB_TYPE = pgx
-      - DB_DSN = postgres://postgres:postgres@localhost:5432/matchmaker
-    depends_on:
-      - postgresql
-    networks:
-      - ps
 
-  agent:
-    image: matchmaker:agent
-    container_name: matchmaker-agent
-    ports:
-      - "8081:8081"
-    depends_on:
-      - server
-    networks:
-      - ps
-
-networks:
-  ps:

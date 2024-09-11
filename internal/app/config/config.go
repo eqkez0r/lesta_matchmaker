@@ -12,6 +12,8 @@ import (
 const (
 	// Значение хоста по умолчанию
 	defaultAddr = "localhost:8080"
+
+	defaultPath = "./config.yaml"
 )
 
 var (
@@ -20,24 +22,19 @@ var (
 )
 
 type Config struct {
-	ServerConfig     servercfg.ServerConfig `json:"server_config"`
-	DatabaseConfig   dbcfg.DatabaseConfig   `json:"database_config"`
-	MatchmakerConfig mmcfg.MatchmakerConfig `json:"matchmaker_config"`
+	ServerConfig     servercfg.ServerConfig `json:"server_config" yaml:"server_config"`
+	DatabaseConfig   dbcfg.DatabaseConfig   `json:"database_config" yaml:"database_config"`
+	MatchmakerConfig mmcfg.MatchmakerConfig `json:"matchmaker_config" yaml:"matchmaker_config"`
 }
 
 func NewConfig() (*Config, error) {
 	cfg := &Config{}
 
-	flag.StringVar(&cfg.ServerConfig.Host, "a", defaultAddr, "server host")
-	flag.StringVar(&cfg.DatabaseConfig.DatabaseURL, "d", "", "database uri")
-	flag.StringVar(&cfg.DatabaseConfig.DatabaseType, "t", "pgx", "database type")
-	flag.UintVar(&cfg.MatchmakerConfig.GroupSize, "gs", 10, "group size")
-	flag.Parse()
-
 	if len(flag.Args()) != 0 {
 		return nil, ErrUnexpectedArguments
 	}
-	err := cleanenv.ReadEnv(cfg)
+
+	err := cleanenv.ReadConfig(defaultPath, cfg)
 	if err != nil {
 		return nil, err
 	}

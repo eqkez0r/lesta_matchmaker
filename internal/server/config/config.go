@@ -1,5 +1,5 @@
 package config
 
 type ServerConfig struct {
-	Host string `yaml:"host" env:"SERVER_HOST"`
+	Host string `json:"host" yaml:"host" env:"SERVER_HOST"`
 }

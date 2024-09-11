@@ -26,8 +26,8 @@ func (b *skillbucket) Players() []player.Player {
 	return b.players
 }
 
-func (b *skillbucket) Reset(groupSize uint8) {
-	b.players = b.players[:groupSize]
+func (b *skillbucket) Reset(groupSize uint) {
+	b.players = b.players[groupSize:]
 }
 
 func (b *skillbucket) SortByLatency() {

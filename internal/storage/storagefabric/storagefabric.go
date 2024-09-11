@@ -1,8 +1,9 @@
-package storage
+package storagefabric
 
 import (
 	"context"
 	"github.com/eqkez0r/lesta_matchmaker/internal/logger"
+	"github.com/eqkez0r/lesta_matchmaker/internal/storage"
 	"github.com/eqkez0r/lesta_matchmaker/internal/storage/config"
 	"github.com/eqkez0r/lesta_matchmaker/internal/storage/memory"
 	"github.com/eqkez0r/lesta_matchmaker/internal/storage/pgx"
@@ -17,7 +18,7 @@ func NewStorage(
 	ctx context.Context,
 	l logger.ILogger,
 	cfg config.DatabaseConfig,
-) (IStorage, error) {
+) (storage.IStorage, error) {
 	switch cfg.DatabaseType {
 	case memoryType:
 		{
@@ -29,7 +30,7 @@ func NewStorage(
 		}
 	default:
 		{
-			return nil, ErrUnknownStorageType
+			return nil, storage.ErrUnknownStorageType
 		}
 	}
 }

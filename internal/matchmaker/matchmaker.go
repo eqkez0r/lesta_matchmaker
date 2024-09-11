@@ -10,6 +10,7 @@ import (
 )
 
 type ClearPlayersProvider interface {
+	GetAllPlayers(ctx context.Context) ([]player.Player, error)
 	DeleteGroupPlayer(ctx context.Context, players []player.Player) error
 }
 
@@ -29,6 +30,7 @@ func NewMatchmaker(
 	store ClearPlayersProvider,
 ) *Matchmaker {
 	return &Matchmaker{
+		m:         make(map[float32]skillbucket),
 		groupSize: cfg.GroupSize,
 		logger:    logger,
 		store:     store,
@@ -38,8 +40,15 @@ func NewMatchmaker(
 func (m *Matchmaker) Run(
 	ctx context.Context,
 	wg *sync.WaitGroup,
-	playerPooler <-chan player.Player,
+	playerPooler chan player.Player,
 ) {
+	players, err := m.store.GetAllPlayers(ctx)
+	if err != nil {
+		m.logger.Error(err)
+	}
+	for _, pl := range players {
+		playerPooler <- pl
+	}
 	for {
 		select {
 		case <-ctx.Done():
@@ -50,32 +59,35 @@ func (m *Matchmaker) Run(
 			}
 		case pl := <-playerPooler:
 			{
+				m.logger.Infof("matchmaker got player %v", pl)
 				m.mu.Lock()
 				skill := float32(math.Floor(float64(pl.Skill)))
-				b := m.m[skill]
-				b.PutPlayer(pl)
 				pls := m.m[skill]
+				pls.PutPlayer(pl)
 				if len(pls.Players()) >= int(m.groupSize) {
-					b.SortByLatency()
-					err := m.store.DeleteGroupPlayer(ctx, pls.Players())
+					pls.SortByLatency()
+					err = m.store.DeleteGroupPlayer(ctx, pls.Players())
 					if err != nil {
 						m.logger.Error(err)
 						m.mu.Unlock()
 						continue
 					}
-					st := b.Stat(m.groupSize)
-					m.logger.Infof("registered match %d \n"+
-						"skill  min/max/avg %f/%f/%f \n"+
-						"latency min/max/avg %f/%f/%f \n"+
-						"spent time in queue min/max/avg %t/%t/%t \n"+
+					st := pls.Stat(m.groupSize)
+					m.logger.Infof("registered match %d "+
+						"skill  min/max/avg %f/%f/%f "+
+						"latency min/max/avg %f/%f/%f "+
+						"spent time in queue min/max/avg %t/%t/%t "+
 						"players %v",
 						m.groupCounter,
 						st.minSkill, st.maxSkill, st.avgSkill,
 						st.minLatency, st.maxLatency, st.avgLatency,
 						st.minLatency, st.maxLatency, st.avgLatency,
 						st.playersList)
+					pls.Reset(m.groupSize)
 					//здесь какая-то регистрация матча
+					m.groupCounter++
 				}
+				m.m[skill] = pls
 				m.mu.Unlock()
 			}
 		default:

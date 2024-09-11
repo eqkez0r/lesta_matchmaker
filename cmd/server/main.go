@@ -5,7 +5,7 @@ import (
 	"github.com/eqkez0r/lesta_matchmaker/internal/app"
 	"github.com/eqkez0r/lesta_matchmaker/internal/app/config"
 	zaplogger "github.com/eqkez0r/lesta_matchmaker/internal/logger/zap"
-	"github.com/eqkez0r/lesta_matchmaker/internal/storage"
+	"github.com/eqkez0r/lesta_matchmaker/internal/storage/storagefabric"
 	"os"
 	"os/signal"
 	"syscall"
@@ -23,7 +23,9 @@ func main() {
 		os.Exit(1)
 	}
 
-	store, err := storage.NewStorage(ctx, l, cfg.DatabaseConfig)
+	l.Infof("app started with config %v", cfg)
+
+	store, err := storagefabric.NewStorage(ctx, l, cfg.DatabaseConfig)
 	if err != nil {
 		l.Errorf("Error creating storage: %v", err)
 		os.Exit(1)
@@ -31,6 +33,6 @@ func main() {
 
 	defer store.GracefulStop()
 
-	a := app.New(ctx, l, store, cfg)
+	a := app.New(ctx, l, cfg, store)
 	a.Run(ctx)
 }

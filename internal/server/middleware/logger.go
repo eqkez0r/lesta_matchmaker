@@ -33,11 +33,11 @@ func Logger(
 		duration := time.Since(start)
 
 		l.Info(
-			"URL", c.Request.URL,
-			"METHOD", c.Request.Method,
-			"STATUS", data.status,
-			"SIZE", data.size,
-			"DURATION", duration,
+			"URL ", c.Request.URL,
+			" METHOD ", c.Request.Method,
+			" STATUS ", data.status,
+			" SIZE ", data.size,
+			" DURATION ", duration,
 		)
 	}
 }

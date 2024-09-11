@@ -14,6 +14,8 @@ const (
     skill double precision,
     latency double precision
      )`
+
+	getAllPlayers  = `SELECT * FROM players`
 	putPlayerQuery = `INSERT INTO players(name, skill, latency) VALUES ($1, $2, $3)`
 	deletePlayers  = `DELETE FROM players WHERE name = $1`
 )
@@ -33,6 +35,10 @@ func NewPgxStorage(
 		return nil, err
 	}
 	err = conn.Ping(ctx)
+	if err != nil {
+		return nil, err
+	}
+	_, err = conn.Exec(ctx, createTableQuery)
 	if err != nil {
 		return nil, err
 	}
@@ -59,6 +65,24 @@ func (p *PgxStorage) DeleteGroupPlayer(ctx context.Context, players []player.Pla
 		}
 	}
 	return nil
+}
+
+func (p *PgxStorage) GetAllPlayers(ctx context.Context) ([]player.Player, error) {
+	rows, err := p.conn.Query(ctx, getAllPlayers)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var players []player.Player
+	for rows.Next() {
+		var player player.Player
+		err = rows.Scan(&player.Name, &player.Skill, &player.Latency)
+		if err != nil {
+			return nil, err
+		}
+		players = append(players, player)
+	}
+	return players, nil
 }
 
 func (p *PgxStorage) GracefulStop() {
