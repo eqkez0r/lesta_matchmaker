@@ -13,18 +13,10 @@ import (
 func main() {
 	l := logger.New("zap")
 
-	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
+	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT)
 	defer stop()
 
-	cfg, err := app.NewConfig()
-	if err != nil {
-		l.Errorf("Error loading config: %v", err)
-		os.Exit(1)
-	}
-
-	l.Infof("app started with config %v", cfg)
-
-	store, err := storage.NewStorage(ctx, l, cfg.DatabaseConfig)
+	store, err := storage.NewStorage(ctx, l)
 	if err != nil {
 		l.Errorf("Error creating storage: %v", err)
 		os.Exit(1)
@@ -32,6 +24,10 @@ func main() {
 
 	defer store.GracefulStop()
 
-	a := app.New(ctx, l, cfg, store)
+	a, err := app.New(ctx, l, store)
+	if err != nil {
+		l.Errorf("Error creating app: %v", err)
+		os.Exit(1)
+	}
 	a.Run(ctx)
 }

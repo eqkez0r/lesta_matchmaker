@@ -11,7 +11,7 @@ import (
 
 const (
 	memoryType   = "memory"
-	postgresType = "pgx"
+	postgresType = "postgres"
 )
 
 type IStorage interface {
@@ -24,21 +24,19 @@ type IStorage interface {
 func NewStorage(
 	ctx context.Context,
 	l logger.ILogger,
-	cfg DatabaseConfig,
 ) (IStorage, error) {
-	//TODO init and parse cfg
+
+	cfg, err := initCfg()
+	if err != nil {
+		return nil, err
+	}
+
 	switch cfg.DatabaseType {
 	case memoryType:
-		{
-			return memory.New(l), nil
-		}
+		return memory.New(l), nil
 	case postgresType:
-		{
-			return pgx.NewPgxStorage(ctx, l, cfg)
-		}
+		return pgx.NewPgxStorage(ctx, l, cfg.DatabaseURL)
 	default:
-		{
-			return nil, storageerrors.ErrUnknownStorageType
-		}
+		return nil, storageerrors.ErrUnknownStorageType
 	}
 }

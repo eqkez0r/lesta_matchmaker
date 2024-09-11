@@ -1,7 +1,6 @@
 package zaplogger
 
 import (
-	"github.com/eqkez0r/lesta_matchmaker/pkg/logger"
 	"go.uber.org/zap"
 )
 
@@ -38,5 +37,3 @@ func (z *ZapLogger) Warnf(format string, v ...interface{}) {
 func (z *ZapLogger) Errorf(format string, v ...interface{}) {
 	z.logger.Errorf(format, v...)
 }
-
-var _ logger.ILogger = (*ZapLogger)(nil)

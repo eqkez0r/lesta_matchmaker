@@ -1,7 +1,4 @@
-server_config:
-  host: "127.0.0.1:8080"
-database_config:
-  database_type: "pgx"
-  database_url: "postgres://postgres:postgres@localhost:5432/matchmaker"
-matchmaker_config:
-  group_size: 4
+host: "127.0.0.1:8080"
+database_type: "postgres"
+database_url: "postgres://postgres:postgres@localhost:5432/matchmaker"
+group_size: 4

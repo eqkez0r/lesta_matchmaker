@@ -24,15 +24,18 @@ type Matchmaker struct {
 
 func NewMatchmaker(
 	logger logger.ILogger,
-	cfg MatchmakerConfig,
 	store ClearPlayersProvider,
-) *Matchmaker {
+) (*Matchmaker, error) {
+	cfg, err := initCfg()
+	if err != nil {
+		return nil, err
+	}
 	return &Matchmaker{
 		m:         make(map[float32]skillbucket),
 		groupSize: cfg.GroupSize,
 		logger:    logger,
 		store:     store,
-	}
+	}, nil
 }
 
 func (m *Matchmaker) Run(
