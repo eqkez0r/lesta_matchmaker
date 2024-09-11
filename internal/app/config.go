@@ -1,11 +1,11 @@
-package config
+package app
 
 import (
 	"errors"
 	"flag"
-	mmcfg "github.com/eqkez0r/lesta_matchmaker/internal/matchmaker/config"
-	servercfg "github.com/eqkez0r/lesta_matchmaker/internal/server/config"
-	dbcfg "github.com/eqkez0r/lesta_matchmaker/internal/storage/config"
+	mmcfg "github.com/eqkez0r/lesta_matchmaker/internal/matchmaker"
+	servercfg "github.com/eqkez0r/lesta_matchmaker/internal/server"
+	dbcfg "github.com/eqkez0r/lesta_matchmaker/internal/storage"
 	"github.com/ilyakaznacheev/cleanenv"
 )
 

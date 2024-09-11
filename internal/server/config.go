@@ -1,4 +1,4 @@
-package config
+package server
 
 type ServerConfig struct {
 	Host string `json:"host" yaml:"host" env:"SERVER_HOST"`

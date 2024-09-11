@@ -1,7 +1,7 @@
 package zaplogger
 
 import (
-	"github.com/eqkez0r/lesta_matchmaker/internal/logger"
+	"github.com/eqkez0r/lesta_matchmaker/pkg/logger"
 	"go.uber.org/zap"
 )
 

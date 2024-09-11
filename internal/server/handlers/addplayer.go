@@ -2,8 +2,8 @@ package handlers
 
 import (
 	"context"
-	"github.com/eqkez0r/lesta_matchmaker/internal/logger"
-	"github.com/eqkez0r/lesta_matchmaker/pkg/object/player"
+	"github.com/eqkez0r/lesta_matchmaker/internal/object/player"
+	"github.com/eqkez0r/lesta_matchmaker/pkg/logger"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )

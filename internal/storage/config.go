@@ -1,4 +1,4 @@
-package config
+package storage
 
 type DatabaseConfig struct {
 	DatabaseType string `json:"database_type" yaml:"database_type" env:"DB_TYPE"`

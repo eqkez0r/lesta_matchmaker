@@ -2,19 +2,18 @@ package app
 
 import (
 	"context"
-	"github.com/eqkez0r/lesta_matchmaker/internal/app/config"
-	"github.com/eqkez0r/lesta_matchmaker/internal/logger"
 	"github.com/eqkez0r/lesta_matchmaker/internal/matchmaker"
+	"github.com/eqkez0r/lesta_matchmaker/internal/object/player"
 	"github.com/eqkez0r/lesta_matchmaker/internal/server"
 	"github.com/eqkez0r/lesta_matchmaker/internal/storage"
-	"github.com/eqkez0r/lesta_matchmaker/pkg/object/player"
+	"github.com/eqkez0r/lesta_matchmaker/pkg/logger"
 	"sync"
 )
 
 type App struct {
 	logger     logger.ILogger
 	store      storage.IStorage
-	cfg        *config.Config
+	cfg        *Config
 	httpserver *server.HTTPServer
 	matchmaker *matchmaker.Matchmaker
 	playerChan chan player.Player
@@ -23,7 +22,7 @@ type App struct {
 func New(
 	ctx context.Context,
 	l logger.ILogger,
-	cfg *config.Config,
+	cfg *Config,
 	store storage.IStorage,
 
 ) *App {

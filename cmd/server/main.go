@@ -3,21 +3,20 @@ package main
 import (
 	"context"
 	"github.com/eqkez0r/lesta_matchmaker/internal/app"
-	"github.com/eqkez0r/lesta_matchmaker/internal/app/config"
-	zaplogger "github.com/eqkez0r/lesta_matchmaker/internal/logger/zap"
-	"github.com/eqkez0r/lesta_matchmaker/internal/storage/storagefabric"
+	"github.com/eqkez0r/lesta_matchmaker/internal/storage"
+	"github.com/eqkez0r/lesta_matchmaker/pkg/logger"
 	"os"
 	"os/signal"
 	"syscall"
 )
 
 func main() {
-	l := zaplogger.New()
+	l := logger.New("zap")
 
 	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
 	defer stop()
 
-	cfg, err := config.NewConfig()
+	cfg, err := app.NewConfig()
 	if err != nil {
 		l.Errorf("Error loading config: %v", err)
 		os.Exit(1)
@@ -25,7 +24,7 @@ func main() {
 
 	l.Infof("app started with config %v", cfg)
 
-	store, err := storagefabric.NewStorage(ctx, l, cfg.DatabaseConfig)
+	store, err := storage.NewStorage(ctx, l, cfg.DatabaseConfig)
 	if err != nil {
 		l.Errorf("Error creating storage: %v", err)
 		os.Exit(1)

@@ -2,12 +2,11 @@ package server
 
 import (
 	"context"
-	"github.com/eqkez0r/lesta_matchmaker/internal/logger"
-	servercfg "github.com/eqkez0r/lesta_matchmaker/internal/server/config"
+	"github.com/eqkez0r/lesta_matchmaker/internal/object/player"
 	"github.com/eqkez0r/lesta_matchmaker/internal/server/handlers"
 	"github.com/eqkez0r/lesta_matchmaker/internal/server/middleware"
 	"github.com/eqkez0r/lesta_matchmaker/internal/storage"
-	"github.com/eqkez0r/lesta_matchmaker/pkg/object/player"
+	"github.com/eqkez0r/lesta_matchmaker/pkg/logger"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"sync"
@@ -23,7 +22,7 @@ type HTTPServer struct {
 func New(
 	ctx context.Context,
 	l logger.ILogger,
-	config servercfg.ServerConfig,
+	config ServerConfig,
 	store storage.IStorage,
 	pch chan player.Player,
 ) *HTTPServer {
