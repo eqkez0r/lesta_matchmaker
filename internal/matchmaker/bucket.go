@@ -1,7 +1,7 @@
 package matchmaker
 
 import (
-	"github.com/eqkez0r/lesta_matchmaker/pkg/object/player"
+	"github.com/eqkez0r/lesta_matchmaker/internal/object/player"
 	"math"
 	"sort"
 	"time"

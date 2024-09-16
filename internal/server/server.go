@@ -2,12 +2,11 @@ package server
 
 import (
 	"context"
-	"github.com/eqkez0r/lesta_matchmaker/internal/logger"
-	servercfg "github.com/eqkez0r/lesta_matchmaker/internal/server/config"
+	"github.com/eqkez0r/lesta_matchmaker/internal/object/player"
 	"github.com/eqkez0r/lesta_matchmaker/internal/server/handlers"
 	"github.com/eqkez0r/lesta_matchmaker/internal/server/middleware"
 	"github.com/eqkez0r/lesta_matchmaker/internal/storage"
-	"github.com/eqkez0r/lesta_matchmaker/pkg/object/player"
+	"github.com/eqkez0r/lesta_matchmaker/pkg/logger"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"sync"
@@ -23,26 +22,29 @@ type HTTPServer struct {
 func New(
 	ctx context.Context,
 	l logger.ILogger,
-	config servercfg.ServerConfig,
 	store storage.IStorage,
 	pch chan player.Player,
-) *HTTPServer {
+) (*HTTPServer, error) {
+
 	gin.DisableConsoleColor()
 	gin.SetMode(gin.ReleaseMode)
 
 	router := gin.New()
 	router.Use(gin.Recovery(), middleware.Logger(l))
 	router.Handle("POST", handlers.PutPlayerPath, handlers.AddPlayerHandler(ctx, l, store, pch))
-
+	cfg, err := initCfg()
+	if err != nil {
+		return nil, err
+	}
 	return &HTTPServer{
 		server: &http.Server{
-			Addr:    config.Host,
+			Addr:    cfg.Host,
 			Handler: router,
 		},
 		engine: router,
 		store:  store,
 		logger: l,
-	}
+	}, err
 }
 
 func (s *HTTPServer) Start(ctx context.Context, wg *sync.WaitGroup) {

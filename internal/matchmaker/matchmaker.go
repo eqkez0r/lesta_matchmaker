@@ -2,9 +2,8 @@ package matchmaker
 
 import (
 	"context"
-	"github.com/eqkez0r/lesta_matchmaker/internal/logger"
-	"github.com/eqkez0r/lesta_matchmaker/internal/matchmaker/config"
-	"github.com/eqkez0r/lesta_matchmaker/pkg/object/player"
+	"github.com/eqkez0r/lesta_matchmaker/internal/object/player"
+	"github.com/eqkez0r/lesta_matchmaker/pkg/logger"
 	"math"
 	"sync"
 )
@@ -17,7 +16,6 @@ type ClearPlayersProvider interface {
 type Matchmaker struct {
 	logger    logger.ILogger
 	groupSize uint
-	mu        sync.RWMutex // for highload it change to rw
 	m         map[float32]skillbucket
 	store     ClearPlayersProvider
 
@@ -26,15 +24,18 @@ type Matchmaker struct {
 
 func NewMatchmaker(
 	logger logger.ILogger,
-	cfg config.MatchmakerConfig,
 	store ClearPlayersProvider,
-) *Matchmaker {
+) (*Matchmaker, error) {
+	cfg, err := initCfg()
+	if err != nil {
+		return nil, err
+	}
 	return &Matchmaker{
 		m:         make(map[float32]skillbucket),
 		groupSize: cfg.GroupSize,
 		logger:    logger,
 		store:     store,
-	}
+	}, nil
 }
 
 func (m *Matchmaker) Run(
@@ -60,7 +61,6 @@ func (m *Matchmaker) Run(
 		case pl := <-playerPooler:
 			{
 				m.logger.Infof("matchmaker got player %v", pl)
-				m.mu.Lock()
 				skill := float32(math.Floor(float64(pl.Skill)))
 				pls := m.m[skill]
 				pls.PutPlayer(pl)
@@ -69,7 +69,6 @@ func (m *Matchmaker) Run(
 					err = m.store.DeleteGroupPlayer(ctx, pls.Players())
 					if err != nil {
 						m.logger.Error(err)
-						m.mu.Unlock()
 						continue
 					}
 					st := pls.Stat(m.groupSize)
@@ -88,7 +87,6 @@ func (m *Matchmaker) Run(
 					m.groupCounter++
 				}
 				m.m[skill] = pls
-				m.mu.Unlock()
 			}
 		default:
 			{

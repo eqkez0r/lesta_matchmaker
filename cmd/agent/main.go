@@ -3,7 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
-	"github.com/eqkez0r/lesta_matchmaker/pkg/object/player"
+	"github.com/eqkez0r/lesta_matchmaker/internal/object/player"
 	"github.com/go-resty/resty/v2"
 	"math/rand"
 	"os"

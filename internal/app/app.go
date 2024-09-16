@@ -2,19 +2,17 @@ package app
 
 import (
 	"context"
-	"github.com/eqkez0r/lesta_matchmaker/internal/app/config"
-	"github.com/eqkez0r/lesta_matchmaker/internal/logger"
 	"github.com/eqkez0r/lesta_matchmaker/internal/matchmaker"
+	"github.com/eqkez0r/lesta_matchmaker/internal/object/player"
 	"github.com/eqkez0r/lesta_matchmaker/internal/server"
 	"github.com/eqkez0r/lesta_matchmaker/internal/storage"
-	"github.com/eqkez0r/lesta_matchmaker/pkg/object/player"
+	"github.com/eqkez0r/lesta_matchmaker/pkg/logger"
 	"sync"
 )
 
 type App struct {
 	logger     logger.ILogger
 	store      storage.IStorage
-	cfg        *config.Config
 	httpserver *server.HTTPServer
 	matchmaker *matchmaker.Matchmaker
 	playerChan chan player.Player
@@ -23,20 +21,24 @@ type App struct {
 func New(
 	ctx context.Context,
 	l logger.ILogger,
-	cfg *config.Config,
 	store storage.IStorage,
-
-) *App {
+) (*App, error) {
 	pch := make(chan player.Player, 100)
-	ser := server.New(ctx, l, cfg.ServerConfig, store, pch)
+	ser, err := server.New(ctx, l, store, pch)
+	if err != nil {
+		return nil, err
+	}
+	mm, err := matchmaker.NewMatchmaker(l, store)
+	if err != nil {
+		return nil, err
+	}
 	return &App{
 		logger:     l,
 		store:      store,
-		cfg:        cfg,
 		httpserver: ser,
-		matchmaker: matchmaker.NewMatchmaker(l, cfg.MatchmakerConfig, store),
+		matchmaker: mm,
 		playerChan: pch,
-	}
+	}, nil
 }
 
 func (app *App) Run(ctx context.Context) {

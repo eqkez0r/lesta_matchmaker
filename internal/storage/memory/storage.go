@@ -2,9 +2,9 @@ package memory
 
 import (
 	"context"
-	"github.com/eqkez0r/lesta_matchmaker/internal/logger"
-	"github.com/eqkez0r/lesta_matchmaker/internal/storage"
-	"github.com/eqkez0r/lesta_matchmaker/pkg/object/player"
+	"github.com/eqkez0r/lesta_matchmaker/internal/object/player"
+	"github.com/eqkez0r/lesta_matchmaker/internal/storage/storageerrors"
+	"github.com/eqkez0r/lesta_matchmaker/pkg/logger"
 	"sync"
 )
 
@@ -25,7 +25,7 @@ func New(
 func (s *StorageMemory) PutPlayer(ctx context.Context, player player.Player) error {
 	_, ok := s.PlayerMap[player.Name]
 	if ok {
-		return storage.ErrPlayerInQueue
+		return storageerrors.ErrPlayerInQueue
 	}
 	s.mu.Lock()
 	s.PlayerMap[player.Name] = player

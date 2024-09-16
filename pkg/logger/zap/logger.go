@@ -1,7 +1,6 @@
 package zaplogger
 
 import (
-	"github.com/eqkez0r/lesta_matchmaker/internal/logger"
 	"go.uber.org/zap"
 )
 
@@ -10,8 +9,14 @@ type ZapLogger struct {
 }
 
 func New() *ZapLogger {
+	cfg := zap.NewDevelopmentConfig()
+	cfg.DisableStacktrace = true
+	logger, err := cfg.Build()
+	if err != nil {
+		panic(err)
+	}
 	return &ZapLogger{
-		logger: zap.NewExample().Sugar(),
+		logger: logger.Sugar(),
 	}
 }
 
@@ -38,5 +43,3 @@ func (z *ZapLogger) Warnf(format string, v ...interface{}) {
 func (z *ZapLogger) Errorf(format string, v ...interface{}) {
 	z.logger.Errorf(format, v...)
 }
-
-var _ logger.ILogger = (*ZapLogger)(nil)

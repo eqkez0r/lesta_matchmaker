@@ -1,7 +1,7 @@
 package middleware
 
 import (
-	"github.com/eqkez0r/lesta_matchmaker/internal/logger"
+	"github.com/eqkez0r/lesta_matchmaker/pkg/logger"
 	"time"
 
 	"github.com/gin-gonic/gin"
